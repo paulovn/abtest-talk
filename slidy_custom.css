@@ -1,0 +1,119 @@
+body
+{
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  width: 100%;
+  height: 100%;
+  min-height: 740px;
+  background-color:  black;
+  font-family: "Verdana", "Gill Sans MT", "Gill Sans", GillSans, sans-serif;
+  /*font-size: 14pt;*/
+
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -ms-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+  -webkit-transition: opacity 250ms ease-in;
+  -webkit-transition-delay: 100ms;
+  -moz-transition: opacity 250ms ease-in 100ms;
+  -o-transition: opacity 250ms ease-in 100ms;
+  transition: opacity 250ms ease-in 100ms;
+}
+
+div.slide {
+  background-color:  white;
+
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  /*font-size: 26px;
+  color: #797979;*/
+  
+  max-width: 1200px;
+  /*height: 700px;*/
+  /*margin-left: -450px;
+  margin-top: -350px;*/
+  margin: 10px auto;
+  padding: 20px ;
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+
+  -webkit-transition: all 0.6s ease-in-out;
+  -moz-transition: all 0.6s ease-in-out;
+  -o-transition: all 0.6s ease-in-out;
+  transition: all 0.6s ease-in-out;
+}
+
+/* --------------------------------------------------------------------- */
+
+div.slide h1 {
+  color: maroon;
+  font-size: 180%;
+}
+
+div.slide h1.subtitle {
+    padding-top: 20pt;
+    padding-bottom: 80pt;
+    color: #202020;
+    font-size: 120%;
+}
+
+div.initial_prompt {
+    background-color: yellow;
+}
+
+div.toolbar {
+    font-family: Georgia, "Times New Roman", "Times Roman", Times, serif;
+}
+
+
+/* --------------------------------------------------------------------- */
+
+div.slide_compressed {
+    font-size: 80%;
+}
+
+div.slide_compressed h1{
+    font-size: 120%;
+}
+
+div.slide_last {
+    font-size: 150%;
+    padding-top: 6em;
+    font-family: Georgia, "Times New Roman", "Times Roman", Times, serif;
+}
+
+div.slide_blank {
+    font-size: 1%;
+    color: white;
+}
+
+
+/* --------------------------------------------------------------------- */
+
+a:link {
+  color: blue;
+  text-decoration: none;
+}
+
+a:visited {
+  color: blue;
+  text-decoration: none;
+}
+
+a:hover {
+  color: blue;
+  text-decoration: underline;
+}
+
+a:active {
+  color: red;
+  text-decoration: underline;
+}
+

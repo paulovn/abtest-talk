@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Paulo Villegas" />
+  <title>A simple simulation for an A/B test significance scenario</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="pvalue-simulations_files/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="slidy_custom.css" />
+  <script src="pvalue-simulations_files/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">A simple simulation for an A/B test significance scenario</h1>
+  <h1 class="subtitle"><em>a.k.a.</em> a hundred shades of grey</h1>
+  <p class="author">
+Paulo Villegas
+  </p>
+  <p class="date">November 2014</p>
+</div>
+<div id="scenario" class="slide section level1">
+<h1>Scenario</h1>
+<ul class="incremental">
+<li><p>Imagine we have decided our web application would look much better and improve the user experience if the background were a nice, calming grey instead of the current too-bright-white.</p>
+<p>Our customers would be much better served!</p></li>
+<li><p>We prepare two versions of the service:</p>
+<ol class="incremental" style="list-style-type: upper-alpha">
+<li><p>The control group will be served the current, dull white background</p></li>
+<li><p>While the treatment group will be served the new, much improved, grey background. They will be much happier and use more our service</p></li>
+</ol></li>
+</ul>
+</div>
+<div id="scenario-2" class="slide section level1">
+<h1>Scenario (2)</h1>
+<ul class="incremental">
+<li><p>Our evaluation metric is total minutes spent per day for each user. So that’s what we will measure.</p></li>
+<li><p>Unfortunately in the simulation we’ll do our users are not sensitive to background color: they act the same (and hence spend the same amount of minutes) regardless of the colour.</p></li>
+<li><p>Beyond the natural variation across users in minutes spent, there is no actual difference between groups, no matter how pretty our background is.</p></li>
+</ul>
+</div>
+<div id="lets-get-into-code" class="slide section level1 smaller">
+<h1>Let’s get into code …</h1>
+<p>We’ll generate the treatment &amp; control groups as random variables with that SAME mean: two groups of users that spend on average the same amount of time with us.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Our users spent on our site an average of half an hour, with a deviation of 4 minutes</span>
+VALUE =<span class="st"> </span><span class="dv">30</span>
+SD =<span class="st"> </span><span class="dv">4</span></code></pre>
+<p>i.e. we have <em>no</em> effect here</p>
+<p>As it’s a random assignment from a population with the same behaviour, we also expect the variance of those two groups to be the same</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># And we will put 1000 users (small sample!) in each of our treatment and control groups</span>
+SIZE =<span class="st"> </span><span class="dv">1000</span>
+<span class="co"># Generate our treatment and control groups</span>
+vt =<span class="st"> </span><span class="kw">rnorm</span>( SIZE, <span class="dt">mean=</span>VALUE, <span class="dt">sd=</span>SD)
+vc =<span class="st"> </span><span class="kw">rnorm</span>( SIZE, <span class="dt">mean=</span>VALUE, <span class="dt">sd=</span>SD)
+
+<span class="co"># Let&#39;s put them into a data frame, for plotting purposes</span>
+data1 =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">minutes=</span>vt, <span class="dt">bucket=</span><span class="st">&#39;treatment&#39;</span> )
+data2 =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">minutes=</span>vc, <span class="dt">bucket=</span><span class="st">&#39;control&#39;</span> )
+values =<span class="st"> </span><span class="kw">rbind</span>( data1, data2 )  </code></pre>
+</div>
+<div id="plot" class="slide section level1 smaller">
+<h1>Plot!</h1>
+<p>We plot those distributions, and we mark also the actual means we got <!-- http://www.cookbook-r.com/Graphs/Plotting_distributions_%28ggplot2%29/ --></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)
+<span class="kw">ggplot</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">data=</span>values, <span class="kw">aes</span>(<span class="dt">x=</span>minutes, <span class="dt">fill=</span>bucket), <span class="dt">binwidth=</span><span class="dv">1</span>, <span class="dt">position=</span><span class="st">&#39;dodge&#39;</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="kw">aes</span>(<span class="dt">xintercept=</span><span class="kw">mean</span>(vt)),
+             <span class="dt">color=</span><span class="st">&quot;#00CC33&quot;</span>, <span class="dt">alpha=</span><span class="dv">1</span>) +
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="kw">aes</span>(<span class="dt">xintercept=</span><span class="kw">mean</span>(vc)),
+             <span class="dt">color=</span><span class="st">&quot;#0033CC&quot;</span>, <span class="dt">linetype=</span><span class="st">&quot;dashed&quot;</span>, <span class="dt">alpha=</span><span class="dv">1</span>) +
+<span class="st">  </span><span class="kw">scale_fill_manual</span>( <span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;#00CC33&quot;</span>,<span class="st">&quot;#0033CC&quot;</span>))</code></pre>
+<p><img src="pvalue-simulations_files/figure-slidy/unnamed-chunk-3-1.png" /></p>
+<p>… and both distributions seem pretty close. Treatment doesn’t make a difference. Exactly as we designed our simulation.</p>
+</div>
+<div id="test" class="slide section level1">
+<h1>Test!</h1>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Let&#39;s make a statistical test: we compare both means looking for a significant difference</span>
+
+<span class="co"># We do a one-tailed t-test. Our H1 is: the treatment has a higher mean.</span>
+<span class="kw">t.test</span>( vt, vc, <span class="dt">alternative=</span><span class="st">&#39;greater&#39;</span> )</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  vt and vc
+## t = 0.7023, df = 1996.016, p-value = 0.2413
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  -0.1657422        Inf
+## sample estimates:
+## mean of x mean of y 
+##  30.20756  30.08418</code></pre>
+<p>… as expected, we don’t reject H0: there is <em>no</em> effect here.</p>
+<p>So our try with the grey background was not successful :-(</p>
+</div>
+<div id="but-we-are-not-done-yet" class="slide section level1">
+<h1>But we are not done yet …</h1>
+<ul class="incremental">
+<li><p>Ok, our first try did not work: we got no effect by changing the background.</p></li>
+<li><p>But we still believe in our hypothesis, so we want to make more tries. Using different greys for the background</p></li>
+<li><p>Let’s simplify by defining a couple of utility functions, which will allow us to generate multiple simulations. <a href="#(10)">Skip them</a> if you want to get directly to the meat.</p></li>
+</ul>
+</div>
+<div id="helper-functions-1" class="slide section level1 slide_compressed">
+<h1>helper functions (1)</h1>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#  Simulate &lt;num&gt; runs of a t-test comparing the means of two random variables with the SAME mean</span>
+<span class="co">#</span>
+generate_tests &lt;-<span class="st"> </span>function( num ) {
+
+  values =<span class="st"> </span><span class="kw">data.frame</span>()
+  rtests =<span class="st"> </span><span class="kw">data.frame</span>()
+  
+  for( idx in <span class="dv">1</span>:num ) {
+
+    <span class="co"># Generate the treatment &amp; control groups</span>
+    vt =<span class="st"> </span><span class="kw">rnorm</span>( SIZE, <span class="dt">mean=</span>VALUE, <span class="dt">sd=</span>SD)
+    vc =<span class="st"> </span><span class="kw">rnorm</span>( SIZE, <span class="dt">mean=</span>VALUE, <span class="dt">sd=</span>SD)
+  
+    <span class="co"># Perform a 1-tailed significance test, testing for a greater value of the treatment group</span>
+    r =<span class="st"> </span><span class="kw">t.test</span>( vt, vc, <span class="dt">alternative=</span><span class="st">&#39;greater&#39;</span> )
+
+    <span class="co"># Pack all into a single data frame</span>
+    data1 =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">minutes=</span>vt, <span class="dt">bucket=</span><span class="st">&#39;treatment&#39;</span>, <span class="dt">idx=</span>idx )
+    data2 =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">minutes=</span>vc, <span class="dt">bucket=</span><span class="st">&#39;control&#39;</span>, <span class="dt">idx=</span>idx )
+    values =<span class="st"> </span><span class="kw">rbind</span>( values, data1 )  
+    values =<span class="st"> </span><span class="kw">rbind</span>( values, data2 )  
+
+    <span class="co"># And pack also the test results into another dataframe</span>
+    rtests =<span class="st"> </span><span class="kw">rbind</span>( rtests, <span class="kw">list</span>(<span class="dt">idx=</span>idx, <span class="dt">treatment=</span><span class="kw">mean</span>(vt), 
+                                 <span class="dt">control=</span><span class="kw">mean</span>(vc), <span class="dt">p.value=</span>r$p.value, 
+                                 <span class="dt">minutes=</span><span class="dv">0</span>) )
+  } 
+  <span class="kw">return</span> (<span class="kw">list</span>(<span class="dt">values=</span>values,<span class="dt">rtests=</span>rtests))
+}</code></pre>
+</div>
+<div id="helper-functions-2" class="slide section level1 slide_compressed">
+<h1>helper functions (2)</h1>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Plot in a grid the data frame containing all tests made in the run, also indicating for</span>
+<span class="co"># each test the mean for treatment and control groups</span>
+<span class="co"># If any of those tests contains a statistically significant difference, the plot will</span>
+<span class="co"># be highlighted in red</span>
+<span class="co">#</span>
+plot_grid &lt;-<span class="st"> </span>function( data ) {
+  g =<span class="st"> </span><span class="kw">ggplot</span>() +<span class="st"> </span>
+<span class="st">    </span><span class="co"># histograms</span>
+<span class="st">    </span><span class="kw">geom_histogram</span>(<span class="dt">data=</span>data$values, <span class="kw">aes</span>(<span class="dt">x=</span>minutes, <span class="dt">fill=</span>bucket), <span class="dt">binwidth=</span><span class="dv">1</span>, <span class="dt">position=</span><span class="st">&#39;dodge&#39;</span>) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">scale_fill_manual</span>( <span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;#00CC33&quot;</span>,<span class="st">&quot;#0033CC&quot;</span>)) +
+<span class="st">    </span><span class="co"># means for treatment</span>
+<span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">data=</span>data$rtests, <span class="kw">aes</span>(<span class="dt">xintercept=</span>treatment),
+               <span class="dt">color=</span><span class="st">&quot;#00CC33&quot;</span>, <span class="dt">alpha=</span><span class="dv">1</span>) +
+<span class="st">    </span><span class="co"># means for control</span>
+<span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">data=</span>data$rtests, <span class="kw">aes</span>(<span class="dt">xintercept=</span>control),
+               <span class="dt">color=</span><span class="st">&quot;#0033CC&quot;</span>, <span class="dt">linetype=</span><span class="st">&quot;dashed&quot;</span>, <span class="dt">alpha=</span><span class="dv">1</span>)
+
+  <span class="co"># If there are significant tests (with p&lt;0.05), highlight them</span>
+  significant =<span class="st"> </span><span class="kw">subset</span>(data$rtests, p.value&lt;<span class="fl">0.05</span>)
+  if( <span class="kw">nrow</span>(significant) &gt;<span class="st"> </span><span class="dv">0</span> )
+    g &lt;-<span class="st"> </span>g +<span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_rect</span>( <span class="dt">data=</span><span class="kw">subset</span>(data$rtests,p.value&lt;<span class="fl">0.05</span>),
+               <span class="kw">aes</span>(<span class="dt">xmin=</span>-<span class="ot">Inf</span>, <span class="dt">xmax=</span><span class="ot">Inf</span>, <span class="dt">ymin=</span>-<span class="ot">Inf</span>, <span class="dt">ymax=</span><span class="ot">Inf</span>), <span class="dt">fill=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span><span class="fl">0.3</span> )
+
+  <span class="co"># Grid by test number</span>
+  g &lt;-<span class="st"> </span>g +<span class="st"> </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>idx )
+  
+  <span class="co"># Plot it. Suppress the warnings we might get because of the rect geom not covering the</span>
+  <span class="co"># whole idx factor (only the plots with p&lt;0.05)</span>
+  <span class="kw">suppressWarnings</span>( <span class="kw">print</span>(g) ) 
+}</code></pre>
+</div>
+<div id="tries2" class="slide section level1">
+<h1>Launch more tries</h1>
+<p>Now we can try two other different greys for the background, and test each one of them</p>
+<pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">generate_tests</span>(<span class="dv">2</span>)
+<span class="kw">plot_grid</span>( data )</code></pre>
+<p><img src="pvalue-simulations_files/figure-slidy/unnamed-chunk-6-1.png" /></p>
+</div>
+<div id="and-more-tries" class="slide section level1">
+<h1>And more tries</h1>
+<p>Still nothing. Let’s try 4 more greys …</p>
+<pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">generate_tests</span>(<span class="dv">4</span>)
+<span class="kw">plot_grid</span>( data )</code></pre>
+<p><img src="pvalue-simulations_files/figure-slidy/unnamed-chunk-7-1.png" /></p>
+</div>
+<div id="over-the-edge" class="slide section level1">
+<h1>Over the edge …</h1>
+<p>Ok, let’s bite the bullet and test 100 different shades of grey …</p>
+<pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">generate_tests</span>(<span class="dv">100</span>)</code></pre>
+</div>
+<div id="section" class="slide section level1 slide_blank">
+<h1> </h1>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_grid</span>( data )</code></pre>
+<p><img src="pvalue-simulations_files/figure-slidy/unnamed-chunk-9-1.png" /></p>
+</div>
+<div id="whoa-we-got-effect" class="slide section level1">
+<h1>Whoa, we got effect!!!</h1>
+<ul class="incremental">
+<li><p>Finally there is something: some of the greys <em>do</em> work. Users spend more minutes with them</p></li>
+<li><p>But wait a minute: didn’t we said that all simulations have been made with <strong>no</strong> effect?</p></li>
+</ul>
+</div>
+<div id="what-is-happening-here" class="slide section level1">
+<h1>What is happening here?</h1>
+<p>In a sentence: <strong>statistical fluctuation</strong></p>
+<ul class="incremental">
+<li>we designed our test with a significance value of p&lt;0.05.
+<ul class="incremental">
+<li><p>which means that the probability of “failing to adequately reject H0” is 0.05</p></li>
+<li><p>in other words, the probability of obtaining a difference between treatment and control greater than our significance threshold <em>due to chance</em> is 5%</p></li>
+<li><p>translating: quite probably in 5 out of every 100 tests with no effect we will nevertheless detect an effect</p></li>
+<li><p>and this is (roughly) what we saw</p></li>
+</ul></li>
+</ul>
+</div>
+<div id="bottom-line" class="slide section level1">
+<h1>Bottom line</h1>
+<ul class="incremental">
+<li>If we do many tests (which we should) we are bound to obtain some “false” significant outcomes</li>
+<li>So we need to be careful when interpreting results of an A/B testing experiments</li>
+<li>There are some mitigation measures we can take (such as increasing the required signficance level for metrics with low priors)</li>
+</ul>
+</div>
+<div id="section-1" class="slide section level1 slide_last">
+<h1> </h1>
+<p><a href="index.html">Back to the A/B Testing primer</a></p>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>
