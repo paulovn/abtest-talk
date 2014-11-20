@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+  // A function to get a handle to the window where the SVG renders in
+  function getSVGWindow( object ) {
+    try {
+      svgdoc = object.getSVGDocument();
+    } catch( exception ) {
+      if( object.contentDocument )
+        svgdoc = object.contentDocument ;
+    }
+    if (svgdoc && svgdoc.defaultView)  // try the W3C standard way first
+      return svgdoc.defaultView;
+    else if (object.window)
+      return object.window;
+    else try {
+      return object.getWindow();
+    } catch(exception) {
+    }
+  }
+  // Ensure the SCV has focus
+  window.addEventListener( "load", 
+      function () {
+        document.querySelector("object").focus();
+        /*if( window.location.hash ) {
+          embed = document.getElementById( 'SVGDOC' );
+          svgwin = getSVGWindow( embed );
+          svgwin.sozi.player.moveToFrame( Number(window.location.hash.substring(1))-1 );
+        }*/
+      }, 
+    false );
+</script>
+<style>
+html, body {
+ height : 100%;
+ min-height: 100%;
+ overflow: hidden ;
+}
+object.sozi {
+ box-shadow: 0px 5px 10px 3px #E6E6E6;
+ border: 1px solid #E6E6E6;
+ overflow: hidden;
+ width: 100%;
+ height: 100%; 
+ display: block;
+ margin-left: auto;
+ margin-right: auto;
+</style>
+</head>
+
+<body style="padding: 0px; margin: 0px;">
+  <object id="SVGDOC" onload="gotoFrame(this);" type="image/svg+xml" data="abtest_h.svg" class="sozi">
+  You need a browser capable of rendering SVG content. Try Firefox or Chrome.
+    <script>
+      function gotoFrame(obj) {
+         if( window.location.hash ) {
+           fnumber = Number( window.location.hash.substring(1) )-1;
+           svgdoc = getSVGWindow( obj );
+           svgdoc.sozi.player.moveToFrame( fnumber );
+         }
+      }
+    </script>
+  </object>
+</body>
+</html>

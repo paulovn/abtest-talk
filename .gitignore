@@ -1,0 +1,13 @@
+*~
+
+# We ignore, as a rule, all svg & R. We'll add, explicitly, the ones we want
+*.svg
+*.R
+
+# Other
+*.md
+
+# Not included
+pending
+old
+*.orig
