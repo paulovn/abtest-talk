@@ -83,9 +83,17 @@ div.slide_compressed h1{
     font-size: 120%;
 }
 
+div.slide_mini {
+    font-size: 60%;
+}
+
+div.slide_notitle h1 {
+    display: none;
+}
+
 div.slide_last {
     font-size: 150%;
-    padding-top: 6em;
+    padding-top: 7em;
     font-family: Georgia, "Times New Roman", "Times Roman", Times, serif;
 }
 

@@ -107,13 +107,13 @@ values =<span class="st"> </span><span class="kw">rbind</span>( data1, data2 )  
 ##  Welch Two Sample t-test
 ## 
 ## data:  vt and vc
-## t = 0.2203, df = 1994.414, p-value = 0.4128
+## t = -0.331, df = 1997.835, p-value = 0.6297
 ## alternative hypothesis: true difference in means is greater than 0
 ## 95 percent confidence interval:
-##  -0.2549385        Inf
+##  -0.3469031        Inf
 ## sample estimates:
 ## mean of x mean of y 
-##  29.91643  29.87703</code></pre>
+##  30.09762  30.15572</code></pre>
 <p>… as expected, we don’t reject H0: there is <em>no</em> effect here.</p>
 <p>So our try with the grey background was not successful :-(</p>
 </div>
@@ -210,29 +210,31 @@ plot_grid &lt;-<span class="st"> </span>function( data ) {
 <p>Ok, let’s bite the bullet and test 100 different shades of grey …</p>
 <pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">generate_tests</span>(<span class="dv">100</span>)</code></pre>
 </div>
-<div id="section" class="slide section level1 slide_blank">
-<h1> </h1>
-<p><em>(remember, red background means that there is a statistically significant effect)</em></p>
+<div id="plot-it" class="slide section level1 slide_mini slide_notitle">
+<h1>(plot it)</h1>
+<p><em>(remember, a red background means that there is a statistically significant effect)</em></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_grid</span>( data )</code></pre>
-<p><img src="pvalues_files/figure-slidy/unnamed-chunk-10-1.png" /></p>
+<p><img src="pvalues_files/figure-slidy/unnamed-chunk-9-1.png" /></p>
 </div>
 <div id="whoa-we-got-effect" class="slide section level1">
 <h1>Whoa, we got effect!!!</h1>
 <ul class="incremental">
 <li><p>Finally there is something: some of the greys <em>do</em> work. Users spend more minutes with them</p></li>
-<li><p>But wait a minute: didn’t we said that all simulations have been made with <strong>no</strong> effect?</p></li>
+<li><p>But wait a minute: didn’t we say that all simulations have been made so that there is actually <strong>no</strong> effect?</p></li>
 </ul>
 </div>
 <div id="what-is-happening-here" class="slide section level1">
 <h1>What is happening here?</h1>
 <p>In a sentence: <strong>statistical fluctuation</strong></p>
 <ul class="incremental">
-<li>we designed our test with a significance value of p&lt;0.05.
+<li><p>We designed our test with a significance value of p&lt;0.05.</p>
 <ul class="incremental">
 <li><p>which means that the probability of “failing to adequately reject H0” is 0.05</p></li>
-<li><p>in other words, the probability of obtaining a difference between treatment and control greater than our significance threshold <em>due to chance</em> is 5%</p></li>
+<li><p>in other words, the probability of obtaining a difference between treatment and control greater than our significance threshold <strong>due to chance</strong> is 5%</p></li>
 <li><p>translating: quite probably in 5 out of every 100 tests with no effect we will nevertheless detect an effect</p></li>
 <li><p>and this is (roughly) what we saw</p></li>
+<li><p>note that this is random: we might have got a significant effect even already in our first simulation (though the probability for this is low)</p></li>
+<li><p>in general, this is more probable if we do <em>many</em> tests</p></li>
 </ul></li>
 </ul>
 </div>
@@ -244,8 +246,8 @@ plot_grid &lt;-<span class="st"> </span>function( data ) {
 <li>There are some mitigation measures we can take (such as increasing the required signficance level for metrics with low priors)</li>
 </ul>
 </div>
-<div id="section-1" class="slide section level1 slide_last">
-<h1> </h1>
+<div id="end" class="slide section level1 slide_last slide_notitle">
+<h1>(end)</h1>
 <p><a href="index.html#58">Back to the A/B Testing primer</a></p>
 </div>
 
